@@ -28,17 +28,40 @@ class Main {
         // Read file contents and split by line
         const fileContents = fs.readFileSync(`inputs/temp.py`, 'utf-8')
         const fileLines = fileContents.split('\n')
-        console.log(fileLines)
+        //console.log(fileLines)
 
         // Determine the lines of where functions are identified
         const functionIdentifiers = /[A-Za-z]ef\s+.*\(.*\):/i
-        let lineNumbers = []
+        let startLines = []
         for (let x = 0; x < fileLines.length; x++) {
             if (functionIdentifiers.test(fileLines[x])) {
-                lineNumbers.push(x + 1)
+                startLines.push(x)
             }
         }
-        console.log(lineNumbers)
+
+        // Determine the end of every function
+        let endLines = []
+        for (const start in startLines) {
+            for (let x = startLines[start] + 1; x < fileLines.length; x++) {
+                if (!fileLines[x].startsWith(' ') && fileLines[x] != '' || x == fileLines.length) {
+                    endLines.push(x)
+                    break;
+                }
+            }
+        }
+        //console.log(endLines)
+
+        // Write functions to distinct files
+        for (let x = 0; x < startLines.length; x++) {
+            let data = '';
+
+            // Get contents through start and end lines
+            for (var i = startLines[x]; i < endLines[x]; i++) {
+                data = data + fileLines[i] + '\n'
+            }
+            
+            fs.writeFileSync(`outputs/${fileLines[startLines[x]].split('def ')[1].split('(')[0]}.py`, data, 'utf8')
+        }
     }
 }
 
