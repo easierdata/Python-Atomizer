@@ -6,9 +6,16 @@
  */
 
 import * as fs from 'fs'
+import * as dotenv from "dotenv"
+dotenv.config()
 
 class Main {
+    apiKey: string | undefined
+
     constructor() {
+        this.apiKey = process.env.WEB3_STORAGE_KEY
+
+        if (!this.apiKey) throw new Error("Configure ENV file first!")
         this.traverseInputs()
     }
 
@@ -19,16 +26,18 @@ class Main {
      */
     async traverseInputs(): Promise<void> {
         const files = fs.readdirSync('inputs')
-        const pythonFiles = files.filter((file: string) => file.includes('.py'))
-        //console.log(pythonFiles)
-        return this.findContent();
+        const pythonFiles = files.filter((file: string) => file.includes('.py') && file != 'example.py')
+
+        // For every file in the inputs folder
+        for (const file in pythonFiles) {
+            await this.findContent(pythonFiles[file])
+        }
     }
 
-    async findContent(): Promise<void> {
+    async findContent(name: string): Promise<void> {
         // Read file contents and split by line
-        const fileContents = fs.readFileSync(`inputs/temp.py`, 'utf-8')
+        const fileContents = fs.readFileSync(`inputs/${name}`, 'utf-8')
         const fileLines = fileContents.split('\n')
-        //console.log(fileLines)
 
         // Determine the lines of where functions are identified
         const functionIdentifiers = /[A-Za-z]ef\s+.*\(.*\):/i
@@ -49,7 +58,9 @@ class Main {
                 }
             }
         }
-        //console.log(endLines)
+
+        // Array of names of all functions
+        let functionNames = []
 
         // Write functions to distinct files
         for (let x = 0; x < startLines.length; x++) {
@@ -61,7 +72,31 @@ class Main {
             }
             
             fs.writeFileSync(`outputs/${fileLines[startLines[x]].split('def ')[1].split('(')[0]}.py`, data, 'utf8')
+            functionNames.push(`${fileLines[startLines[x]].split('def ')[1].split('(')[0]}.py`)
         }
+
+        this.uploadToIPFS(name, functionNames)
+    }
+
+    async uploadToIPFS(name: string, functions: string[]) {
+        /**
+         * Example dictionary
+         * 
+         * {
+         *  original: <cid>
+         *  functions: {
+         *      ex1: <cid>
+         *      ...
+         *  }
+         * }
+         */
+        console.log(name)
+        console.log(functions)
+
+        // Upload original file to IPFS
+
+
+        // Upload functions to IPFS
     }
 }
 
