@@ -7,6 +7,8 @@
 
 import * as fs from 'fs'
 import * as dotenv from "dotenv"
+import { Web3Storage, getFilesFromPath } from 'web3.storage';
+import { FileObject } from 'files-from-path';
 dotenv.config()
 
 class Main {
@@ -15,7 +17,6 @@ class Main {
     constructor() {
         this.apiKey = process.env.WEB3_STORAGE_KEY
 
-        if (!this.apiKey) throw new Error("Configure ENV file first!")
         this.traverseInputs()
     }
 
@@ -26,7 +27,7 @@ class Main {
      */
     async traverseInputs(): Promise<void> {
         const files = fs.readdirSync('inputs')
-        const pythonFiles = files.filter((file: string) => file.includes('.py') && file != 'example.py')
+        const pythonFiles = files.filter((file: string) => file.includes('.py') && file !== 'example.py')
 
         // For every file in the inputs folder
         for (const file in pythonFiles) {
@@ -52,7 +53,7 @@ class Main {
         let endLines = []
         for (const start in startLines) {
             for (let x = startLines[start] + 1; x < fileLines.length; x++) {
-                if (!fileLines[x].startsWith(' ') && fileLines[x] != '' || x == fileLines.length) {
+                if (!fileLines[x].startsWith(' ') && fileLines[x] !== '' || x === fileLines.length) {
                     endLines.push(x)
                     break;
                 }
@@ -78,25 +79,70 @@ class Main {
         this.uploadToIPFS(name, functionNames)
     }
 
-    async uploadToIPFS(name: string, functions: string[]) {
-        /**
-         * Example dictionary
-         * 
-         * {
-         *  original: <cid>
-         *  functions: {
-         *      ex1: <cid>
-         *      ...
-         *  }
-         * }
-         */
-        console.log(name)
-        console.log(functions)
+    async uploadToIPFS(name: string, functionNames: string[]) {
+        if (!this.apiKey) throw new Error('Configure ENV File First!')
+        const client = new Web3Storage({ token: this.apiKey });
+        let dictionary = {}
 
         // Upload original file to IPFS
-
+        try {
+            const files = await getFilesFromPath('./inputs');
+            const filtered = files.filter((entry: FileObject) => entry.name !== '/inputs/example.py')
+    
+            for (var x = 0; x < filtered.length; x++) {
+                const isolated = [{
+                    ...filtered[x]
+                }]
+    
+                console.log(`[*] Uploading ${name} to ipfs...`)
+                const cid = await client.put(isolated)
+                dictionary = {
+                    ...dictionary,
+                    [`${name}`]: cid
+                }
+            }
+        } catch (e: any) {
+            console.log(`Error uploading ${name} to IPFS: ${e}`)
+        }
 
         // Upload functions to IPFS
+        try {
+            const files = await getFilesFromPath('./outputs');
+            const filtered = files.filter((entry: FileObject) => functionNames.some((functionName: string) => entry.name.includes(functionName)))
+
+            let functions = {}
+
+            for (var x = 0; x < filtered.length; x++) {
+                const isolated = [{
+                    ...filtered[x]
+                }]
+                
+                console.log(`[*] Uploading ${isolated[0].name.split('/outputs/')[1]} to ipfs...`)
+                const cid = await client.put(isolated)
+                functions = {
+                    ...functions,
+                    [`${isolated[0].name.split('/outputs/')[1]}`]: cid
+                }
+            }
+    
+            dictionary = {
+                ...dictionary,
+                functions: {
+                    ...functions
+                }
+            }
+        } catch (e: any) {
+            console.log(`Error uploading ${name} to IPFS: ${e}`)
+        }
+
+        this.writeResults(dictionary)
+    }
+
+    async writeResults(dictionary: any) {
+        const output = JSON.stringify(dictionary)
+
+        fs.writeFileSync('outputs/result.json', output, 'utf-8')
+        console.log('[!] Finished operation, dictionary written to outputs/results.json')
     }
 }
 
