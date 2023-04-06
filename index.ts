@@ -35,6 +35,13 @@ class Main {
         }
     }
 
+    /**
+     * @function findContent 
+     * 
+     * @param name File name of python file
+     * 
+     * Parses a python file and writes function snippets to outputs folder.
+     */
     async findContent(name: string): Promise<void> {
         // Read file contents and split by line
         const fileContents = fs.readFileSync(`inputs/${name}`, 'utf-8')
@@ -79,6 +86,15 @@ class Main {
         this.uploadToIPFS(name, functionNames)
     }
 
+
+    /**
+     * @function uploadToIPFS
+     * 
+     * @param name name of parent python file
+     * @param functionNames array of individual functions
+     * 
+     * Uploads atomized functions to IPFS and creations dictionary to map CIDs
+     */
     async uploadToIPFS(name: string, functionNames: string[]) {
         if (!this.apiKey) throw new Error('Configure ENV File First!')
         const client = new Web3Storage({ token: this.apiKey });
@@ -138,6 +154,13 @@ class Main {
         this.writeResults(dictionary)
     }
 
+    /**
+     * @function writeResults
+     * 
+     * @param dictionary function-CID key value pair object
+     * 
+     * Write CID dictionary to JSON file locally
+     */
     async writeResults(dictionary: any) {
         const output = JSON.stringify(dictionary)
 
