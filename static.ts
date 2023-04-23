@@ -1,5 +1,5 @@
 /**
- * @file index.ts
+ * @file static.ts
  * 
  * Proof-of-concept to highlight breaking down a python file by function and 
  * assigning each component a CID on IPFS
@@ -170,22 +170,3 @@ class Main {
 }
 
 const tmp = new Main();
-
-/**
- * Comments for Matt:
- * 
- * Part I:
- * 1. Traverse through inputs,
- * 2. Parse files by line
- * 3. Find the beginning of each function
- * 4. For each function, find the next line where the character is != white-space
- * 5. Dump that range into a file 
- * 
- * Part II:
- * 1. Name each file their respective function names
- * 2. Upload to IPFS
- * 3. Dump all CIDs to a file
- * 
- * Part III:
- * 1. Add to JSON the references of other functions/CIDs
- */

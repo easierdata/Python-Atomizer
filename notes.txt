@@ -1,0 +1,38 @@
+Objective: 
+
+Take a python workflow and atomize program & module functions into IPFS CIDs such that the workflow 
+can be replicated on another environment without the need of installing libraries
+
+
+Static Workflow
+-----------------
+Part I:
+1. Traverse through inputs directory & subdirectories
+2. Parse files by line
+3. Find the beginning of each function
+4. For each function, find the next line where the character is != white-space
+5. Dump that range into a file 
+
+Part II:
+1. Name each file their respective function names
+2. Upload to IPFS
+3. Dump all CIDs to a file
+ 
+Part III:
+1. Add to JSON the references of other functions/CIDs
+
+Profiled Workflow
+-------------------
+Part I:
+1. Execute python program in cProfile: python -m cProfile -o program.prof my_program.py
+2. Operate program as necessary
+3. Dump recorded workflow into a file
+
+Part II:
+1. Parse workflow, and extract functions according to location in workflow
+2. Put functions in respective files <- This will be tricky because it should execute like normal (will
+have to point the programs to one another)
+
+Part III:
+1. CAR output and put to IPFS or upload each atomized function to IPFS
+
