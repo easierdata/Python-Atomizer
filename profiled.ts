@@ -8,6 +8,7 @@
 import * as fs from 'fs'
 import * as dotenv from "dotenv"
 import { spawn } from 'child_process'
+import Extractor from './scripts/extractor'
 dotenv.config()
 
 class Profiled {
@@ -29,7 +30,7 @@ class Profiled {
         if (!fs.existsSync('./inputs/profile')) throw new Error('[ERROR] profile does not exist in inputs directory!')
 
         // Execute helper in a subprocess
-        const helper = spawn('python', ['helper.py'])
+        const helper = spawn('python', ['scripts/helper.py'])
 
         helper.on('exit', (data) => {
             return this.readFunctions()
@@ -50,20 +51,37 @@ class Profiled {
         const functionDictionary = JSON.parse(fs.readFileSync('./functions.json', 'utf-8'))
 
         // Iterate through every function name
-        /* for (let x = 0; x < Object.keys(functionDictionary).length; x++) {
-
-            console.log(functionDictionary[Object.keys(functionDictionary)[x]].length)
-        }
-        //console.log(Object.keys(functionDictionary))*/
-
-        // Iterate through every function name
-        Object.keys(functionDictionary).forEach((functionName: string) => {
+        Object.keys(functionDictionary).forEach(async (functionName: string) => {
             // Iterate through instance a function name is invoked
             const invocations = functionDictionary[functionName]
 
             for (let x = 0; x < invocations.length; x++) {
-                //console.log(fs.existsSync(invocations[0][0]))
-                if (!fs.existsSync(invocations[x][0])) console.log(invocations[x][0])
+                
+                // Files in the inputs directory have a unique case
+                if (!fs.existsSync(invocations[x][0]) && invocations[x][0].includes('Python-Atomizer')) {
+                    // Construct fixed directory
+                    const inputFileDirectory: fs.PathLike = invocations[x][0].split('Python-Atomizer/')[0] + 
+                        'Python-Atomizer/inputs/' + invocations[x][0].split('Python-Atomizer/')[1]
+                    console.log(inputFileDirectory)
+                    
+                    // Extract function and write to outputs folder
+                    const extract = new Extractor({
+                        functionName,
+                        directory: inputFileDirectory,
+                        lineNumber: invocations[x][1]
+                    })
+
+                    await extract.extractFunction()
+                } else {
+                    // Extract function and write to outputs folder
+                    const extract = new Extractor({
+                        functionName,
+                        directory: invocations[x][0],
+                        lineNumber: invocations[x][1]
+                    })
+
+                    await extract.extractFunction()
+                }
             }
         })
     }

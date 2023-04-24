@@ -9,7 +9,7 @@ import pstats
 import json
 
 # Read the encoded profile
-stats = pstats.Stats('inputs/profile2')
+stats = pstats.Stats('inputs/profile')
 functions = {}
 
 # Loop through all the keys in the profile
