@@ -36,8 +36,9 @@ class Extractor {
 
             // Find the end of function
             let endline = 0;
-            for (let x = this.lineNumber; x < fileLines.length; x++) {
-                if (!fileLines[x].startsWith(' ') && fileLines[x] !== '' || x === fileLines.length) {
+            for (let x = this.lineNumber - 1; x < fileLines.length; x++) {
+                console.log(`${this.functionName} - ${x} - ${fileLines.length} - ${(!fileLines[x].startsWith(' ') && fileLines[x] !== '' && x !== this.lineNumber || x === fileLines.length)}`)
+                if (!fileLines[x].startsWith(' ') && fileLines[x] !== '' && x !== this.lineNumber - 1 || x === fileLines.length - 1) {
                     endline = x
                     break;
                 }
@@ -53,10 +54,10 @@ class Extractor {
             
             // Write function to file
             if(fs.existsSync('outputs')) {
-                fs.writeFileSync(`outputs/${this.functionName}`, data, 'utf8')
+                fs.writeFileSync(`outputs/${this.functionName}.py`, data, 'utf8')
             } else {
                 fs.mkdirSync('outputs')
-                fs.writeFileSync(`outputs/${this.functionName}`, data, 'utf8')
+                fs.writeFileSync(`outputs/${this.functionName}.py`, data, 'utf8')
             }
 
             return
