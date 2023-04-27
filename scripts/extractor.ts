@@ -37,7 +37,6 @@ class Extractor {
             // Find the end of function
             let endline = 0;
             for (let x = this.lineNumber - 1; x < fileLines.length; x++) {
-                console.log(`${this.functionName} - ${x} - ${fileLines.length} - ${(!fileLines[x].startsWith(' ') && fileLines[x] !== '' && x !== this.lineNumber || x === fileLines.length)}`)
                 if (!fileLines[x].startsWith(' ') && fileLines[x] !== '' && x !== this.lineNumber - 1 || x === fileLines.length - 1) {
                     endline = x
                     break;

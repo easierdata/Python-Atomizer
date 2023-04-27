@@ -9,6 +9,7 @@ import * as fs from 'fs'
 import * as dotenv from "dotenv"
 import { spawn } from 'child_process'
 import Extractor from './scripts/extractor'
+import Referencer from './scripts/referencer'
 dotenv.config()
 
 class Profiled {
@@ -84,6 +85,30 @@ class Profiled {
                 }
             }
         })
+
+        return this.crossReference()
+    }
+
+    /**
+     * @function crossReference
+     * 
+     * Iterates through output functions and points them to one another
+     */
+    async crossReference(): Promise<void> {
+        // Check to see if outputs exists
+        if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
+
+        const files = fs.readdirSync('outputs')
+        const pythonFiles = files.filter((file: string) => file.includes('.py'))
+
+        for (const file in pythonFiles) {
+            const referencer = new Referencer({
+                directory: `./outputs/${pythonFiles[file]}`,
+                functions: pythonFiles
+            })
+
+            await referencer.readFunction()
+        }
     }
 }
 
