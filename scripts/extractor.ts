@@ -52,7 +52,12 @@ class Extractor {
             }
             
             // Write function to file
-            fs.writeFileSync(`outputs/${this.functionName}`, data, 'utf8')
+            if(fs.existsSync('outputs')) {
+                fs.writeFileSync(`outputs/${this.functionName}`, data, 'utf8')
+            } else {
+                fs.mkdirSync('outputs')
+                fs.writeFileSync(`outputs/${this.functionName}`, data, 'utf8')
+            }
 
             return
         } catch (e: any) {

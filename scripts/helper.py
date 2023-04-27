@@ -11,6 +11,7 @@ import json
 # Read the encoded profile
 stats = pstats.Stats('inputs/profile')
 functions = {}
+stats.print_stats()
 
 # Loop through all the keys in the profile
 for key in stats.stats.keys():
