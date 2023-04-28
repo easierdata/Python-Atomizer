@@ -64,7 +64,6 @@ class Profiled {
                     // Construct fixed directory
                     const inputFileDirectory: fs.PathLike = invocations[x][0].split('Python-Atomizer/')[0] + 
                         'Python-Atomizer/inputs/' + invocations[x][0].split('Python-Atomizer/')[1]
-                    console.log(inputFileDirectory)
                     
                     // Extract function and write to outputs folder
                     const extract = new Extractor({
@@ -110,6 +109,8 @@ class Profiled {
 
             await referencer.readFunction()
         }
+
+        return this.uploadToIPFS()
     }
 
     /**
