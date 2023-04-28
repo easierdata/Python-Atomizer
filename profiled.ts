@@ -10,6 +10,7 @@ import * as dotenv from "dotenv"
 import { spawn } from 'child_process'
 import Extractor from './scripts/extractor'
 import Referencer from './scripts/referencer'
+import Uploader from './scripts/uploader'
 dotenv.config()
 
 class Profiled {
@@ -109,6 +110,22 @@ class Profiled {
 
             await referencer.readFunction()
         }
+    }
+
+    /**
+     * @function uploadToIPFS
+     * 
+     * Uploads atomized functions to IPFS and outputs JSON manifest
+     */
+    async uploadToIPFS(): Promise<void> {
+        const files = fs.readdirSync('outputs')
+        const pythonFiles = files.filter((file: string) => file.includes('.py'))
+
+        const upload = new Uploader({
+            functions: pythonFiles,
+        })
+
+        await upload.uploadToIPFS()
     }
 }
 

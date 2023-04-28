@@ -9,13 +9,12 @@ import * as dotenv from "dotenv"
 import { Web3Storage, getFilesFromPath } from 'web3.storage';
 dotenv.config()
 
-class Extractor {
-    functions: string[];
-    apiKey: string | undefined;
+class Uploader {
+    functions: string[]
+    apiKey: string | undefined
 
     constructor(data: {
-        functions: string[];
-        lineNumber: number
+        functions: string[],
     }) {
         this.functions = data.functions;
         this.apiKey = process.env.WEB3_STORAGE_KEY
@@ -26,7 +25,7 @@ class Extractor {
      * 
      * Uploads atomized functions to IPFS and creations dictionary to map CIDs
      */
-    async uploadToIPFS() {
+    async uploadToIPFS(): Promise<void> {
         if (!this.apiKey) throw new Error('Configure ENV File First!')
         const client = new Web3Storage({ token: this.apiKey });
         let dictionary = {}
@@ -67,7 +66,7 @@ class Extractor {
      * 
      * Write CID dictionary to JSON file locally
      */
-    async writeResults(dictionary: any) {
+    async writeResults(dictionary: any): Promise<void> {
         const output = JSON.stringify(dictionary)
 
         fs.writeFileSync('outputs/result.json', output, 'utf-8')
@@ -75,4 +74,4 @@ class Extractor {
     }
 }
 
-export default Extractor
+export default Uploader
