@@ -19,12 +19,12 @@ dotenv.config()
  */
 
 class Referencer {
-    directory: fs.PathLike;
-    functions: string;
+    directory: fs.PathLike
+    functions: string
 
     constructor(data: {
-        functions: any;
-        directory: fs.PathLike,
+        functions: any,
+        directory: fs.PathLike
     }) {
         this.directory = data.directory
         this.functions = data.functions

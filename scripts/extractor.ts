@@ -9,12 +9,12 @@ import * as dotenv from "dotenv"
 dotenv.config()
 
 class Extractor {
-    directory: fs.PathLike;
-    lineNumber: number;
-    functionName: string;
+    directory: fs.PathLike
+    lineNumber: number
+    functionName: string
 
     constructor(data: {
-        functionName: string;
+        functionName: string,
         directory: fs.PathLike,
         lineNumber: number
     }) {
@@ -35,16 +35,16 @@ class Extractor {
             const fileLines = fileContents.split('\n')
 
             // Find the end of function
-            let endline = 0;
+            let endline = 0
             for (let x = this.lineNumber - 1; x < fileLines.length; x++) {
                 if (!fileLines[x].startsWith(' ') && fileLines[x] !== '' && x !== this.lineNumber - 1 || x === fileLines.length - 1) {
                     endline = x
-                    break;
+                    break
                 }
             }
 
             // Write functions to distinct files
-            let data = '';
+            let data = ''
 
             // Get contents through start and end lines
             for (var i = this.lineNumber - 1; i < endline; i++) {

@@ -6,7 +6,7 @@
 
 import * as fs from 'fs'
 import * as dotenv from "dotenv"
-import { Web3Storage, getFilesFromPath } from 'web3.storage';
+import { Web3Storage, getFilesFromPath } from 'web3.storage'
 dotenv.config()
 
 class Uploader {
@@ -16,7 +16,7 @@ class Uploader {
     constructor(data: {
         functions: string[],
     }) {
-        this.functions = data.functions;
+        this.functions = data.functions
         this.apiKey = process.env.WEB3_STORAGE_KEY
     }
 
@@ -27,7 +27,7 @@ class Uploader {
      */
     async uploadToIPFS(): Promise<void> {
         if (!this.apiKey) throw new Error('Configure ENV File First!')
-        const client = new Web3Storage({ token: this.apiKey });
+        const client = new Web3Storage({ token: this.apiKey })
         let dictionary = {}
 
         // Upload functions to IPFS

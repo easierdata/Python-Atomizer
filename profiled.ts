@@ -40,8 +40,8 @@ class Profiled {
 
         // Throw an error if subprocess fails
         helper.stderr.on('data', (data) => {
-            throw new Error(`Helper error: ${data}`);
-        });
+            throw new Error(`Helper error: ${data}`)
+        })
     }
 
     /**
@@ -123,14 +123,11 @@ class Profiled {
         const pythonFiles = files.filter((file: string) => file.includes('.py'))
 
         const upload = new Uploader({
-            functions: pythonFiles,
+            functions: pythonFiles
         })
 
         await upload.uploadToIPFS()
     }
 }
 
-const tmp = new Profiled();
-
-// Filter the internal functions (only get the absolute, and the relative ones)
-// Put functions in output directory
+const tmp = new Profiled()
