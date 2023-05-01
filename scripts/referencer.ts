@@ -63,7 +63,8 @@ class Referencer {
                 const lineSplit = fileLines[x].split('(')
 
                 for (const snippet in lineSplit) {
-                    if (functionNames.includes(lineSplit[snippet].replace(/\s/g, ""))) {
+                    // Replace white space and check if function is not already imported
+                    if (functionNames.includes(lineSplit[snippet].replace(/\s/g, "")) && !newFile.includes(`from ${lineSplit[snippet].replace(/\s/g, "")} import ${lineSplit[snippet].replace(/\s/g, "")}`)) {
                         newFile.unshift(`from ${lineSplit[snippet].replace(/\s/g, "")} import ${lineSplit[snippet].replace(/\s/g, "")}`)
                     }
                 }

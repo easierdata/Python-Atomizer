@@ -7,8 +7,8 @@
 
 import * as fs from 'fs'
 import * as dotenv from "dotenv"
-import { Web3Storage, getFilesFromPath } from 'web3.storage';
-import { FileObject } from 'files-from-path';
+import { Web3Storage, getFilesFromPath } from 'web3.storage'
+import { FileObject } from 'files-from-path'
 dotenv.config()
 
 class Main {
