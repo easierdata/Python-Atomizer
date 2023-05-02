@@ -43,6 +43,13 @@ class Referencer {
         return this.findFunctionCalls(fileLines)
     }
 
+    /**
+     * @function findFunctionCalls
+     * 
+     * @param fileLines Array of python file code
+     * 
+     * Find function invocations and adds necessary imports
+     */
     async findFunctionCalls(fileLines: string[]): Promise<void> {
         let newFile = [...fileLines]
 
@@ -80,8 +87,5 @@ class Referencer {
         fs.writeFileSync(this.directory, data, 'utf-8')
     }
 }
-
-// Edge cases to test -> variables defined outside functions
-// Duplicate function invocations
 
 export default Referencer
