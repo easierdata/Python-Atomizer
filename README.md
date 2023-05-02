@@ -11,5 +11,5 @@ Deconstruct python code and assign each function a CID on IPFS
    WEB3_STORAGE_KEY="<API KEY GOES HERE>"
    ```
 3. Add python program to the *inputs* folder
-4. Profile the workflow with `python -m cProfile -o profile <PROGRAM_ENTRY>.py`
-5. Run atomizer with `ts-node profiled.ts`
+4. Profile the workflow in the inputs folder with `python -m cProfile -o profile <PROGRAM_ENTRY>.py`
+5. Run atomizer in root directory with `ts-node profiled.ts`

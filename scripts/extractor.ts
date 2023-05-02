@@ -43,26 +43,81 @@ class Extractor {
                 }
             }
 
-            // Write functions to distinct files
-            let data = ''
+            // Join function lines
+            const data = this.joinFunction(fileLines, this.lineNumber -1, endline)
 
-            // Get contents through start and end lines
-            for (var i = this.lineNumber - 1; i < endline; i++) {
-                data = data + fileLines[i] + '\n'
-            }
-            
+            // Add global variables
+            const functionLines: string[] = await this.addGlobalVars(fileLines.slice(0, this.lineNumber), data.split('\n'))
+            const functionString = this.joinFunction(functionLines, 0, functionLines.length)
+
             // Write function to file
             if(fs.existsSync('outputs')) {
-                fs.writeFileSync(`outputs/${this.functionName}.py`, data, 'utf8')
+                fs.writeFileSync(`outputs/${this.functionName}.py`, functionString, 'utf8')
             } else {
                 fs.mkdirSync('outputs')
-                fs.writeFileSync(`outputs/${this.functionName}.py`, data, 'utf8')
+                fs.writeFileSync(`outputs/${this.functionName}.py`, functionString, 'utf8')
             }
 
             return
         } catch (e: any) {
             throw new Error(`Error extracting function: ${e}`)
         }
+    }
+
+    /**
+     * @function addGlobalVars
+     * 
+     * @param fileLines Array of python file code
+     * @param functionLines array of isolated function code
+     * 
+     * Finds uses of variables and adds definition to function
+     */
+    addGlobalVars(fileLines: string[], functionLines: string[]): string[] {
+        let globalVars: string[] = [];
+
+        fileLines.forEach((line: string) => {
+            if (!line.trim().startsWith('class') && !line.trim().startsWith('def')) {
+                // Test line for variable definition
+                const match = line.match(/^\s*([a-zA-Z_]\w*)\s*=/)
+
+                // Test for variable definition
+                if (match) {
+                    const [, varName] = match
+                    for (let x = 0; x < functionLines.length; x++) {
+                        if (functionLines[x].includes(varName)) {
+                            if (match.input) {
+                                const indentations = ' '.repeat(functionLines[x].search(/\S/))
+                                functionLines.splice(x, 0, `${indentations + match.input}`)
+                            }
+                            break
+                        }
+                    }
+                    globalVars.push(varName)
+                }
+            }
+        })
+
+        return functionLines
+    }
+
+    /**
+     * @function joinFunctions
+     * 
+     * Joins split lines to function string
+     * 
+     * @param lines function lines
+     * @param start start line number
+     * @param end end line number
+     * @returns joined function string
+     */
+    joinFunction(lines: string[], start: number, end: number): string {
+        let joined = ''
+
+        for (let x = start; x < end; x++) {
+            joined = joined + lines[x] + '\n'
+        }
+
+        return joined
     }
 }
 
