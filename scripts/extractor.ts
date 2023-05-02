@@ -34,6 +34,16 @@ class Extractor {
             const fileContents = fs.readFileSync(this.directory, 'utf-8')
             const fileLines = fileContents.split('\n')
 
+            // If nested, find parent class/function
+            if (fileLines[this.lineNumber - 1].search(/\S/) !== 0) {
+                for (let x = this.lineNumber; x > 0; x--) {
+                    if (fileLines[x].search(/\S/) === 0) {
+                        this.lineNumber = x + 1
+                        break
+                    }
+                }
+            }
+
             // Find the end of function
             let endline = 0
             for (let x = this.lineNumber - 1; x < fileLines.length; x++) {
