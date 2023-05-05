@@ -32,10 +32,16 @@ class Profiled {
         if (!fs.existsSync('./inputs/profile')) throw new Error('[ERROR] profile does not exist in inputs directory!')
 
         // Execute helper in a subprocess
-        const helper = spawn('python', ['scripts/helper.py'])
+        console.log('[!] Parsing profile (give this some time)...')
+        let helper = spawn('python', ['scripts/helper.py'])
 
         helper.on('exit', (data) => {
             return this.readFunctions()
+        });
+
+        helper.stdout.on('data', function(data) {
+            // Do something with data to prevent hanging
+            let tmp = data
         });
 
         // Throw an error if subprocess fails
@@ -55,6 +61,7 @@ class Profiled {
         // Iterate through every function name
         Object.keys(functionDictionary).forEach(async (functionName: string) => {
             // Iterate through instance a function name is invoked
+            console.log(`[*] Extracting function: ${functionName}`)
             const invocations = functionDictionary[functionName]
 
             for (let x = 0; x < invocations.length; x++) {
@@ -96,7 +103,7 @@ class Profiled {
      */
     async crossReference(): Promise<void> {
         // Check to see if outputs exists
-        if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
+        //if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
 
         const files = fs.readdirSync('outputs')
         const pythonFiles = files.filter((file: string) => file.includes('.py'))
@@ -126,7 +133,7 @@ class Profiled {
             functions: pythonFiles
         })
 
-        await upload.uploadToIPFS()
+        //await upload.uploadToIPFS()
     }
 }
 

@@ -59,20 +59,24 @@ class Referencer {
             functionNames.push(this.functions[x].substring(0, this.functions[x].length - 3))
         }
 
+        //console.log(this.directory)
+
         // Iterate through function lines
         for (let x = 0; x < fileLines.length; x++) {
 
             // Check for function calls
             const functionIdentifier = /[A-Za-z0-9]+\([A-Za-z0-9]+\)/i
-            if (functionIdentifier.test(fileLines[x]) && !fileLines[x].includes('def')) {
-
+            const functionIdentifier2 = /[A-Za-z0-9]+\(/i
+            if ((functionIdentifier.test(fileLines[x]) || functionIdentifier2.test(fileLines[x])) && !fileLines[x].includes('def')) {
                 // Multiple functions may be on one line [i.e nesting]
                 const lineSplit = fileLines[x].split('(')
+                const substr = lineSplit[0]
+                const functionName = substr.split(' ').slice(-1)[0]
 
                 for (const snippet in lineSplit) {
                     // Replace white space and check if function is not already imported
-                    if (functionNames.includes(lineSplit[snippet].replace(/\s/g, "")) && !newFile.includes(`from ${lineSplit[snippet].replace(/\s/g, "")} import ${lineSplit[snippet].replace(/\s/g, "")}`)) {
-                        newFile.unshift(`from ${lineSplit[snippet].replace(/\s/g, "")} import ${lineSplit[snippet].replace(/\s/g, "")}`)
+                    if (functionNames.includes(functionName) && !newFile.includes(`from ${functionName} import ${functionName}`)) {
+                        newFile.unshift(`from ${functionName} import ${functionName}`)
                     }
                 }
             }
