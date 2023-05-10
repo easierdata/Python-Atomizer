@@ -29,7 +29,7 @@ def extract_by_keyword(keyword: str):
         filename = key[0]
         line_number = key[1]
 
-        if keyword in filename or keyword in function_name:
+        if keyword in filename:
             # Check if the filename is an absolute path or a relative path
             if os.path.isabs(filename):
                 # If the filename is an absolute path, use it as is
@@ -64,4 +64,3 @@ imports_dump.close()
 
 for kw in keywords:
     extract_by_keyword(kw)
-

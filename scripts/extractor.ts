@@ -29,7 +29,6 @@ class Extractor {
      * Parses python file and writes function snippets to outputs folder.
      */
     async extractFunction(): Promise<void> {
-        console.log(`[*] Extracting function: ${this.functionName}`)
         try {
             // Read file contents and split by line
             const fileContents = fs.readFileSync(this.directory, 'utf-8')
