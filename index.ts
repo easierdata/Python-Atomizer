@@ -1,5 +1,5 @@
 /**
- * @file profiled.ts
+ * @file index.ts
  * 
  * Proof-of-concept to highlight breaking down a python file by function and 
  * assigning each component a CID on IPFS through ingesting a profiled program
@@ -11,6 +11,8 @@ import { spawn } from 'child_process'
 import Extractor from './scripts/extractor'
 import Referencer from './scripts/referencer'
 import Uploader from './scripts/uploader'
+import { glob } from 'glob'
+import moduleFuncExtractor from './scripts/moduleFuncExtractor'
 dotenv.config()
 
 class Profiled {
@@ -19,7 +21,30 @@ class Profiled {
     constructor() {
         this.apiKey = process.env.WEB3_STORAGE_KEY
 
-        this.parseProfile()
+        this.parseImports()
+    }
+
+    /**
+     * @function parseImports
+     * 
+     * Create dictionary for imports in inputs directory
+     */
+    async parseImports(): Promise<void> {
+        // Get array of all python files in inputs directory
+        const inputFiles = await glob('./inputs/**/*.py', {
+            ignore: './inputs/example.py'
+        })
+
+        // Traverse each file and parse inputs
+        for (let x = 0; x < inputFiles.length; x++) {
+            const handler = new moduleFuncExtractor({
+                directory: inputFiles[x]
+            })
+
+            await handler.getImports()
+        }
+
+        return this.parseProfile()
     }
 
     /**
@@ -36,7 +61,7 @@ class Profiled {
         let helper = spawn('python', ['scripts/helper.py'])
 
         helper.on('exit', (data) => {
-            return this.readFunctions()
+            return this.readPrimaryFunctions()
         });
 
         helper.stdout.on('data', function(data) {
@@ -51,49 +76,52 @@ class Profiled {
     }
 
     /**
-     * @function readFunctions
+     * @function readPrimaryFunctions
      * 
-     * Spawns helper subprocess to parse profile functions 
+     * Spawns helper subprocess to parse front-facing functions 
      */
-    async readFunctions(): Promise<void> {
-        const functionDictionary = JSON.parse(fs.readFileSync('./functions.json', 'utf-8'))
+    async readPrimaryFunctions(): Promise<void> {
+        if (!fs.existsSync('./outputs')) fs.mkdirSync('./outputs')
+        const functionDictionary = JSON.parse(fs.readFileSync('./scripts/tmp/primary_functions.json', 'utf-8'))
 
         // Iterate through every function name
         Object.keys(functionDictionary).forEach(async (functionName: string) => {
             // Iterate through instance a function name is invoked
             console.log(`[*] Extracting function: ${functionName}`)
-            const invocations = functionDictionary[functionName]
+            const functions = functionDictionary[functionName]
 
-            for (let x = 0; x < invocations.length; x++) {
+            for (let x = 0; x < functions.length; x++) {
                 
-                // Files in the inputs directory have a unique case
-                if (!fs.existsSync(invocations[x][0]) && invocations[x][0].includes('Python-Atomizer')) {
+                // Some files in the inputs directory have a unique case
+                if (!fs.existsSync(functions[x][0]) && functions[x][0].includes('Python-Atomizer')) {
                     // Construct fixed directory
-                    const inputFileDirectory: fs.PathLike = invocations[x][0].split('Python-Atomizer/')[0] + 
-                        'Python-Atomizer/inputs/' + invocations[x][0].split('Python-Atomizer/')[1]
+                    const inputFileDirectory: fs.PathLike = functions[x][0].split('Python-Atomizer/')[0] + 
+                        'Python-Atomizer/inputs/' + functions[x][0].split('Python-Atomizer/')[1]
                     
                     // Extract function and write to outputs folder
                     const extract = new Extractor({
                         functionName,
                         directory: inputFileDirectory,
-                        lineNumber: invocations[x][1]
+                        lineNumber: functions[x][1]
                     })
 
                     await extract.extractFunction()
                 } else {
-                    // Extract function and write to outputs folder
-                    const extract = new Extractor({
-                        functionName,
-                        directory: invocations[x][0],
-                        lineNumber: invocations[x][1]
-                    })
+                    if (functions[x][0].includes('inputs')) {
+                        // Extract function and write to outputs folder
+                        const extract = new Extractor({
+                            functionName,
+                            directory: functions[x][0],
+                            lineNumber: functions[x][1]
+                        })
 
-                    await extract.extractFunction()
+                        await extract.extractFunction()
+                    }
                 }
             }
         })
 
-        return this.crossReference()
+        return this.uploadToIPFS()
     }
 
     /**
@@ -101,9 +129,9 @@ class Profiled {
      * 
      * Iterates through output functions and points them to one another
      */
-    async crossReference(): Promise<void> {
+    /* async crossReference(): Promise<void> {
         // Check to see if outputs exists
-        //if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
+        if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
 
         const files = fs.readdirSync('outputs')
         const pythonFiles = files.filter((file: string) => file.includes('.py'))
@@ -118,7 +146,7 @@ class Profiled {
         }
 
         return this.uploadToIPFS()
-    }
+    } */
 
     /**
      * @function uploadToIPFS
@@ -133,7 +161,7 @@ class Profiled {
             functions: pythonFiles
         })
 
-        //await upload.uploadToIPFS()
+        await upload.uploadToIPFS()
     }
 }
 

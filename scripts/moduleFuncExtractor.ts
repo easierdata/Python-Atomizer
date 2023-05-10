@@ -45,6 +45,8 @@ class moduleFuncExtractor {
 
     /**
      * @function getImports
+     * 
+     * pull function imports
      */
     async getImports(): Promise<void> {
         const importStatements: ImportStatement[] = []
@@ -86,12 +88,29 @@ class moduleFuncExtractor {
             return acc;
         }, [])
 
-        console.log(importedFunctionNames)
+        return this.writeToDictionary(importStatements)
+    }
+
+    /**
+     * @function writeToDictionary
+     * 
+     */
+    async writeToDictionary(imports: ImportStatement[]): Promise<void> {
+        let dictionary;
+
+        if (fs.existsSync('scripts/tmp/secondary_definitions.json')) {
+            // Append and overwrite
+            dictionary = JSON.parse(fs.readFileSync('scripts/tmp/secondary_definitions.json', 'utf8'))
+            dictionary[`${this.directory.toString()}`] = imports
+        } else {
+            dictionary = {
+                [`${this.directory.toString()}`]: imports
+            }
+        }
+
+        fs.writeFileSync('scripts/tmp/secondary_definitions.json', JSON.stringify(dictionary), 'utf-8')
+        return
     }
 }
 
-const test = new moduleFuncExtractor({
-    directory: './inputs/morans_example.py'
-})
-
-test.getImports()
+export default moduleFuncExtractor
