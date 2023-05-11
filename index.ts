@@ -12,6 +12,7 @@ import Extractor from './scripts/extractor'
 import Referencer from './scripts/referencer'
 import Uploader from './scripts/uploader'
 import { glob } from 'glob'
+import moduleFuncFinder from './scripts/moduleFuncFinder'
 import moduleFuncExtractor from './scripts/moduleFuncExtractor'
 dotenv.config()
 
@@ -37,7 +38,7 @@ class Profiled {
 
         // Traverse each file and parse inputs
         for (let x = 0; x < inputFiles.length; x++) {
-            const handler = new moduleFuncExtractor({
+            const handler = new moduleFuncFinder({
                 directory: inputFiles[x]
             })
 
@@ -87,7 +88,6 @@ class Profiled {
         // Iterate through every function name
         Object.keys(functionDictionary).forEach(async (functionName: string) => {
             // Iterate through instance a function name is invoked
-            console.log(`[*] Extracting function: ${functionName}`)
             const functions = functionDictionary[functionName]
 
             for (let x = 0; x < functions.length; x++) {
@@ -121,7 +121,18 @@ class Profiled {
             }
         })
 
-        return this.uploadToIPFS()
+        return this.extractModuleFunctions()
+    }
+
+    async extractModuleFunctions(): Promise<void> {
+        if (fs.existsSync('scripts/tmp/secondary_definitions.json')) {
+            const extract = new moduleFuncExtractor()
+
+            const dictionary = await extract.readPrimaryExtraction()
+            console.log(JSON.stringify(dictionary))
+        } else {
+            return this.uploadToIPFS()
+        }
     }
 
     /**
@@ -161,7 +172,7 @@ class Profiled {
             functions: pythonFiles
         })
 
-        await upload.uploadToIPFS()
+        //await upload.uploadToIPFS()
     }
 }
 
