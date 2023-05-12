@@ -134,6 +134,9 @@ class moduleFuncExtractor {
  *  ]
  * }
  * 
+ * while uploading: {
+ *  filename: cid
+ * }
  */
 
 export default moduleFuncExtractor

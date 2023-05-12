@@ -14,6 +14,7 @@ import Uploader from './scripts/uploader'
 import { glob } from 'glob'
 import moduleFuncFinder from './scripts/moduleFuncFinder'
 import moduleFuncExtractor from './scripts/moduleFuncExtractor'
+import createManifest from './scripts/createManifest'
 dotenv.config()
 
 class Profiled {
@@ -125,46 +126,23 @@ class Profiled {
     }
 
     async extractModuleFunctions(): Promise<void> {
+        let dictionary: any;
         if (fs.existsSync('scripts/tmp/secondary_definitions.json')) {
             const extract = new moduleFuncExtractor()
 
-            const dictionary = await extract.readPrimaryExtraction()
-            console.log(JSON.stringify(dictionary))
-        } else {
-            return this.uploadToIPFS()
+            dictionary = await extract.readPrimaryExtraction()
+            //console.log(JSON.stringify(dictionary))
         }
+
+        return this.uploadToIPFS(dictionary)
     }
-
-    /**
-     * @function crossReference
-     * 
-     * Iterates through output functions and points them to one another
-     */
-    /* async crossReference(): Promise<void> {
-        // Check to see if outputs exists
-        if (!fs.existsSync('./outputs')) throw new Error('[ERROR] outputs directory does not exist!')
-
-        const files = fs.readdirSync('outputs')
-        const pythonFiles = files.filter((file: string) => file.includes('.py'))
-
-        for (const file in pythonFiles) {
-            const referencer = new Referencer({
-                directory: `./outputs/${pythonFiles[file]}`,
-                functions: pythonFiles
-            })
-
-            await referencer.readFunction()
-        }
-
-        return this.uploadToIPFS()
-    } */
 
     /**
      * @function uploadToIPFS
      * 
      * Uploads atomized functions to IPFS and outputs JSON manifest
      */
-    async uploadToIPFS(): Promise<void> {
+    async uploadToIPFS(dictionary: {}): Promise<void> {
         const files = fs.readdirSync('outputs')
         const pythonFiles = files.filter((file: string) => file.includes('.py'))
 
@@ -172,7 +150,18 @@ class Profiled {
             functions: pythonFiles
         })
 
-        //await upload.uploadToIPFS()
+        await upload.uploadToIPFS()
+
+        return this.createManifest(dictionary)
+    }
+
+    async createManifest(dictionary: {}): Promise<void> {
+        const manifest = new createManifest({
+            dictionary
+        })
+
+        await manifest.writeParentFunctions()
+        console.log(`[!] Wrote manifest to outputs/manifest.json`)
     }
 }
 

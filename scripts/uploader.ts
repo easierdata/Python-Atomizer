@@ -42,7 +42,7 @@ class Uploader {
 
                 functions = {
                     ...functions,
-                    [`${this.functions[x].split('.py')[0]}`]: cid
+                    [`${this.functions[x]}`]: cid
                 }
             }
     
@@ -69,8 +69,8 @@ class Uploader {
     async writeResults(dictionary: any): Promise<void> {
         const output = JSON.stringify(dictionary)
 
-        fs.writeFileSync('outputs/result.json', output, 'utf-8')
-        console.log('[!] Finished operation, dictionary written to outputs/results.json')
+        fs.writeFileSync('scripts/tmp/result.json', output, 'utf-8')
+        //console.log('[!] Finished operation, dictionary written to outputs/results.json')
     }
 }
 
