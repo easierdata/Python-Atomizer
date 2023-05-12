@@ -36,10 +36,12 @@ class Extractor {
             const fileLines = fileContents.split('\n')
 
             // If nested, find parent class/function
+            let nest;
             if (fileLines[this.lineNumber - 1].search(/\S/) !== 0) {
                 for (let x = this.lineNumber; x > 0; x--) {
                     if (fileLines[x].search(/\S/) === 0) {
-                        this.lineNumber = x + 1
+                        //this.lineNumber = x + 1
+                        nest = fileLines[x]
                         break
                     }
                 }
@@ -57,8 +59,10 @@ class Extractor {
             // Join function lines
             const data = this.joinFunction(fileLines, this.lineNumber -1, endline)
 
-            // Add global variables
-            const functionLines: string[] = await this.addGlobalVars(fileLines.slice(0, this.lineNumber), data.split('\n'))
+            // Add global variables and parent
+            //let functionLines: string[] = await this.addGlobalVars(fileLines.slice(0, this.lineNumber), data.split('\n'))
+            let functionLines: string[] = data.split('\n')
+            if (nest) functionLines.unshift(nest)
             const functionString = this.joinFunction(functionLines, 0, functionLines.length)
 
             // Write function to file
