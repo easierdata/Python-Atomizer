@@ -1,38 +1,11 @@
-// ts:
-// For each function in inputs directory profiled
-// read input file and get list of imports
-// create dictionary for ^
-
-// py
-// read dictionary
-// find any related function calls
-// place in outputs directory
-
 /**
- * case 1
- * import <name>
- * usage: name.func()
+ * @file moduleFuncFinder
  * 
- * case 2
- * from <name>.<sub_module> import <func>
- * usage: func()
- * 
- * case 3
- * import <name> as <name>
- * usage: name.func()
- * 
- * case 4
- * import <name>.<sub_module> as <name>
- * usage: <name>.<func>
+ * Extract program dependencies
  */
 
 import * as fs from 'fs';
-
-interface ImportStatement {
-    type: 'Import' | 'ImportFrom';
-    names: string[];
-    module?: string;
-}
+import { ImportStatement } from './types';
 
 class moduleFuncFinder {
     directory: fs.PathLike
@@ -94,6 +67,7 @@ class moduleFuncFinder {
     /**
      * @function writeToDictionary
      * 
+     * Writes function hierarchy to file
      */
     async writeToDictionary(imports: ImportStatement[]): Promise<void> {
         if (!fs.existsSync('scripts/tmp')) fs.mkdirSync('scripts/tmp')

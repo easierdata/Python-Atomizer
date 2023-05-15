@@ -19,6 +19,11 @@ class moduleFuncExtractor {
         this.primaryFunctionsBlob = ''
     }
 
+    /**
+     * @function readPrimaryExtraction
+     * 
+     * Parse the first level of function extractions
+     */
     async readPrimaryExtraction(): Promise<any> {
         this.primaryFunctionsBlob = JSON.parse(fs.readFileSync('scripts/tmp/primary_functions.json', 'utf-8'))
         await this.createInvocationDictionary()
@@ -33,6 +38,11 @@ class moduleFuncExtractor {
         return this.dictionary
     }
 
+    /**
+     * @function createInvocationDirectory
+     * 
+     * Create a template for secondary level functions
+     */
     async createInvocationDictionary(): Promise<void> {
         const programModules = JSON.parse(fs.readFileSync('scripts/tmp/secondary_definitions.json', 'utf-8'))
         //console.log(programModules)
@@ -58,6 +68,11 @@ class moduleFuncExtractor {
         }
     }
 
+    /**
+     * @function findModulesInvocations
+     * 
+     * Append secondary function invocations to file
+     */
     async findModulesInvocations(directory: fs.PathLike): Promise<void> {
         const functionContents = fs.readFileSync(directory, 'utf-8')
         const functionLines = functionContents.split('\n')
@@ -73,12 +88,9 @@ class moduleFuncExtractor {
                 
                 if (functionLines[x].includes(`${invocationName[invocationName.length - 1]}(`) ||
                     functionLines[x].includes(`${invocationName[invocationName.length - 1]}.`)) {
-                    //console.log('Found ' + invocationName[invocationName.length - 1] + ': ' + functionLines[x])
                     
                     let functionName: any = functionLines[x].split('(')[0].split('.')
                     functionName = functionName[functionName.length - 1].split(' ')
-                    //console.log(functionName[functionName.length - 1])
-                    //console.log(Object.keys(this.invocations[i])[0] + ' : ' + functionName[functionName.length - 1])
 
                     if (this.primaryFunctionsBlob[`${functionName[functionName.length - 1]}`] && !functionDictionary[`${directory}`]['dependencies'].some((obj: {}) => Object.keys(obj)[0] === `${functionName[functionName.length - 1]}`)) {
                         functionDictionary[`${directory}`]['dependencies'].push({
@@ -116,27 +128,5 @@ class moduleFuncExtractor {
         }
     }
 }
-
-/**
- * final manifest
- * func name: {
- *  cid: 'ndnsajd'
- *  dependencies: [cid1, cid2]
- * }
- * 
- * middle
- * funcDirectory: {
- *  dependencies: [
- *      {
- *          funcname: blahh
- *          subfuncDirectory: blahhh2 
- *      } 
- *  ]
- * }
- * 
- * while uploading: {
- *  filename: cid
- * }
- */
 
 export default moduleFuncExtractor

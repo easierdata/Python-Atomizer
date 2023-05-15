@@ -1,3 +1,9 @@
+/**
+ * @file createManifest
+ * 
+ * Writes function/cid manifest to file
+ */
+
 import * as fs from 'fs'
 
 class createManifest {
@@ -13,13 +19,15 @@ class createManifest {
         this.cids = {}
     }
 
+    /**
+     * @function writeParentFunctions
+     * 
+     * Appends parent functions to dictionary
+     */
     async writeParentFunctions(): Promise<void> {
         this.cids = JSON.parse(fs.readFileSync('scripts/tmp/result.json', 'utf-8'))
-        //console.log(Object.keys(this.cids.functions))
 
         for (let x = 0; x < Object.keys(this.dictionary).length; x++) {
-            let element = {}
-
             // For every function in dictionary, get CID
             for (let i = 0; i < Object.keys(this.cids.functions).length; i++) {
                 if (Object.keys(this.dictionary)[x].includes(Object.keys(this.cids.functions)[i].split('.py')[0])) {
@@ -46,7 +54,13 @@ class createManifest {
         return this.writeManifest()
     }
 
-    // return dependency array
+    /**
+     * @function writeDependencyFunctions 
+     * 
+     * Append dependencies to parent element
+     * 
+     * @param file list of dependency files
+     */
     async writeDependencyFunctions(file: any[]): Promise<any[]> {
         let dependencies = []
 
@@ -61,7 +75,11 @@ class createManifest {
         return dependencies
     }
 
-    // for each 
+    /**
+     * @function writeManifest
+     * 
+     * Write dictionary object to manifest file
+     */
     async writeManifest(): Promise<void> {
         const output = JSON.stringify(this.manifest)
 
