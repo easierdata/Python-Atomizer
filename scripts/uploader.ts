@@ -56,7 +56,33 @@ class Uploader {
             console.log(`Error uploading to IPFS: ${e}`)
         }
 
-        this.writeResults(dictionary)
+        return this.uploadRequirements(dictionary)
+    }
+
+    /**
+     * @function uploadRequirements
+     * 
+     * Upload requirements.txt to IPFS
+     */
+    async uploadRequirements(dictionary: any): Promise<void> {
+        if (!this.apiKey) throw new Error('Configure ENV File First!')
+        const client = new Web3Storage({ token: this.apiKey })
+
+        try {
+            console.log(`[*] Uploading requirements.txt to ipfs...`)
+
+            const file = await getFilesFromPath(`./scripts/tmp/requirements.txt`)           
+            const cid = await client.put(file)
+
+            dictionary = {
+                ...dictionary,
+                [`requirements.txt`]: cid
+            }
+
+            return this.writeResults(dictionary)
+        } catch (e: any) {
+            console.log(`Error uploading to IPFS: ${e}`)
+        }
     }
 
     /**
@@ -70,7 +96,8 @@ class Uploader {
         const output = JSON.stringify(dictionary)
 
         fs.writeFileSync('scripts/tmp/result.json', output, 'utf-8')
-        //console.log('[!] Finished operation, dictionary written to outputs/results.json')
+        
+        return
     }
 }
 

@@ -8,7 +8,7 @@ import * as fs from 'fs'
 
 class createManifest {
     dictionary: any
-    manifest: {}
+    manifest: any
     cids: any
 
     constructor(data: {
@@ -51,7 +51,7 @@ class createManifest {
             }
         }
 
-        return this.writeManifest()
+        return this.parseRequirements()
     }
 
     /**
@@ -73,6 +73,19 @@ class createManifest {
         }
 
         return dependencies
+    }
+
+    /**
+     * @function parseRequirements
+     * 
+     * Adds requirements.txt cid to manifest
+     */
+    async parseRequirements(): Promise<void> {
+        this.cids = JSON.parse(fs.readFileSync('scripts/tmp/result.json', 'utf-8'))
+
+        this.manifest['requirements.txt'] = this.cids['requirements.txt']
+
+        return this.writeManifest()
     }
 
     /**

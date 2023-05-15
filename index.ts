@@ -31,6 +31,9 @@ class Profiled {
      * Create dictionary for imports in inputs directory
      */
     async parseImports(): Promise<void> {
+        // Delete outputs folder if it exists
+        if (fs.existsSync('./outputs')) fs.rmSync('./outputs', { recursive: true, force: true });
+
         // Get array of all python files in inputs directory
         const inputFiles = await glob('./inputs/**/*.py', {
             ignore: './inputs/example.py'

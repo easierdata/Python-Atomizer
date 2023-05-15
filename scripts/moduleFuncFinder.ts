@@ -5,7 +5,8 @@
  */
 
 import * as fs from 'fs';
-import { ImportStatement } from './types';
+import { ImportStatement, importElement } from './types';
+import { exec } from 'child_process';
 
 class moduleFuncFinder {
     directory: fs.PathLike
@@ -61,6 +62,8 @@ class moduleFuncFinder {
             return acc;
         }, [])
 
+        await this.cloneEnvironment(importStatements)
+
         return this.writeToDictionary(importStatements)
     }
 
@@ -85,6 +88,45 @@ class moduleFuncFinder {
 
         fs.writeFileSync('scripts/tmp/secondary_definitions.json', JSON.stringify(dictionary), 'utf-8')
         return
+    }
+
+    /**
+     * @function cloneEnvironment
+     * 
+     * Create a requirements.txt of used pip modules
+     * 
+     * @param imports array of import statements
+     */
+    async cloneEnvironment(imports: any[]): Promise<void> {
+        // Make list of modules
+        let modules: string[] = []
+        imports.forEach((element: importElement) => {
+            if (element.module) {
+                modules.push(element.module.split('.')[0])
+            } else {
+                modules.push(element.names[0].split(' as ')[0].split('.')[0])
+            }
+        })
+
+        // Create requirements.txt contents
+        let child = exec('python -m pip freeze')
+        let requirements = ''
+
+        child.stdout?.on('data', (data) => {
+            // Split the output by newlines and print line by line
+            const lines = data.trim().split('\n');
+            lines.forEach((line: string) => {
+                if (modules.includes(line.split('=')[0])) requirements += `${line}\n`
+            });
+        });
+        
+        child.stderr?.on('data', (data) => {
+            console.error(`[!] Requirement error: ${data}`);
+        });
+        
+        child.on('close', (code) => {
+            fs.writeFileSync('scripts/tmp/requirements.txt', requirements, 'utf-8')
+        })
     }
 }
 
