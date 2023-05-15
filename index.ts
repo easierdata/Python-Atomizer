@@ -9,7 +9,6 @@ import * as fs from 'fs'
 import * as dotenv from "dotenv"
 import { spawn } from 'child_process'
 import Extractor from './scripts/extractor'
-import Referencer from './scripts/referencer'
 import Uploader from './scripts/uploader'
 import { glob } from 'glob'
 import moduleFuncFinder from './scripts/moduleFuncFinder'
@@ -125,6 +124,11 @@ class Profiled {
         return this.extractModuleFunctions()
     }
 
+    /**
+     * @function extractModuleFunctions
+     * 
+     * Extracts imported functions 
+     */
     async extractModuleFunctions(): Promise<void> {
         let dictionary: any;
         if (fs.existsSync('scripts/tmp/secondary_definitions.json')) {
@@ -155,6 +159,13 @@ class Profiled {
         return this.createManifest(dictionary)
     }
 
+    /**
+     * @function createManifest 
+     * 
+     * Writes function/cid manifest to JSON file
+     * 
+     * @param dictionary JSON of functions and CIDs
+     */
     async createManifest(dictionary: {}): Promise<void> {
         const manifest = new createManifest({
             dictionary

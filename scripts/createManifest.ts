@@ -29,8 +29,8 @@ class createManifest {
                     }
 
                     let element = {
-                        [`${Object.keys(this.cids.functions)[i]}`]: {
-                            'cid': this.cids.functions[Object.keys(this.cids.functions)[i]],
+                        [`${this.cids.functions[Object.keys(this.cids.functions)[i]]}`]: {
+                            'function_name': `${Object.keys(this.cids.functions)[i]}`,
                             'dependencies': dependencies
                         }
                     }
@@ -53,7 +53,7 @@ class createManifest {
         for (let x = 0; x < file.length; x++) {
             if (Object.keys(this.cids.functions).includes(`${Object.keys(file[x])[0]}.py`)) {
                 dependencies.push({
-                    [`${Object.keys(file[x])[0]}.py`]: this.cids.functions[`${Object.keys(file[x])[0]}.py`]
+                    [`${this.cids.functions[`${Object.keys(file[x])[0]}.py`]}`]: `${Object.keys(file[x])[0]}.py`
                 })
             }
         }
@@ -70,20 +70,3 @@ class createManifest {
 }
 
 export default createManifest
-
-/*
-output should be
-
-{
-    funcName: {
-        cid: 'jdsakdaw'
-        dependencies: [cid1, cid2]
-    },
-    funcName: {
-        cid: ''
-    }
-}
-
-to achieve this
-for each function
- */
