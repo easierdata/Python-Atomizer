@@ -4,7 +4,7 @@ Deconstruct python code and assign each function a CID on IPFS
 
 **Getting Started**
 
-1. Install dependencies with `npm install`
+1. Install dependencies with `npm install` and `python3 -m pip install -r requirements.txt`
 2. Create an .env file with the following parameter ([Web3.storage](https://web3.storage/) API key)
 
    ```plaintext

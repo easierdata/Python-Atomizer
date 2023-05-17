@@ -1,0 +1,5 @@
+esda
+libpysal
+matplotlib
+numpy
+splot
