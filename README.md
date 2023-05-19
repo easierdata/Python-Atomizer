@@ -13,3 +13,7 @@ Deconstruct python code and assign each function a CID on IPFS
 3. Add python program to the `inputs` folder
 4. Profile the workflow in the root directory with `python -m cProfile -o inputs/profile inputs/<PROGRAM_ENTRY>.py`
 5. Run atomizer in root directory with `ts-node index.ts`
+
+**Node Version**
+
+This project was developed and tested with node version `v18.14.1` the support for other versions is currently unknown. Feel free to use a [node version manager](https://github.com/tj/n) to easily swap between versions
