@@ -19,12 +19,13 @@
   "homepage": "https://github.com/easierdata/Python-Atomizer#readme",
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "typescript": "^5.0.3",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.3"
   },
   "dependencies": {
     "dotenv": "^16.0.3",
     "glob": "^10.2.3",
+    "toml": "^3.0.0",
     "web3.storage": "^4.5.4"
   }
 }

@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "inputs"
+version = "0.1.0"
+description = ""
+authors = ["matthewnanas <mnanas@umd.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.12,<3.13"
+libpysal = "^4.8.0"
+numpy = "1.26.0"
+matplotlib = "^3.8.0"
+esda = "^2.5.0"
+splot = "1.1.5.post1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

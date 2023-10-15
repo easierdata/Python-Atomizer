@@ -14,6 +14,7 @@ import { glob } from 'glob'
 import moduleFuncFinder from './scripts/moduleFuncFinder'
 import moduleFuncExtractor from './scripts/moduleFuncExtractor'
 import createManifest from './scripts/createManifest'
+import * as toml from 'toml'
 dotenv.config()
 
 class Profiled {
@@ -179,4 +180,4 @@ class Profiled {
     }
 }
 
-const tmp = new Profiled()
+const task = new Profiled()
