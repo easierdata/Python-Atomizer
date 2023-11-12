@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as fs from 'fs'
 
 interface RootComponentPayload {
     path: string,
@@ -64,6 +65,8 @@ class pyExtractor {
                     path: `${path}/${codeLinks[x].Name}`
                 }
                 
+                await this.writePyFile(file.Hash["/"], file.Name)
+
                 pyFiles.push(file)
                 continue;
             } else if (codeLinks[x].Name.includes(".")) {
@@ -80,13 +83,21 @@ class pyExtractor {
 
         return pyFiles
     }
+
+    async writePyFile(hash: string, name: string): Promise<void> {
+        if (!fs.existsSync('./desci')) fs.mkdirSync('./desci')
+
+        const response = await axios.get(`https://ipfs.desci.com/ipfs/${hash}`)
+
+        fs.writeFileSync(`desci/${name}`, response.data, 'utf-8')
+    }
 }
 
 async function main() {
     // Replace PID with node of interest
     let tmp = new pyExtractor(76)
     const traversal = await tmp.getRoot();
-    console.log(JSON.stringify(traversal))
+    //console.log(JSON.stringify(traversal))
 }
 
 main();
