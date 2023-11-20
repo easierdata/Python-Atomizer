@@ -48,20 +48,6 @@ class moduleFuncFinder {
             }
         }
         
-        // Extract the names of all functions used by imports
-        const importedFunctionNames: string[] = importStatements.reduce((acc: string[], importStatement: ImportStatement) => {
-            if (importStatement.type === 'Import') {
-                // simple import statements
-                acc.push(...importStatement.names)
-            } else {
-                // import statements with "from"
-                const modulePrefix = importStatement.module ?? ''
-                const functionNames = importStatement.names.map(name => `${modulePrefix}.${name}`)
-                acc.push(...functionNames)
-            }
-            return acc;
-        }, [])
-
         await this.cloneEnvironment(importStatements)
 
         return this.writeToDictionary(importStatements)
