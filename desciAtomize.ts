@@ -1,5 +1,7 @@
 import axios from "axios";
-import * as fs from 'fs'
+import * as fs from 'fs';
+import { glob } from 'glob';
+import DesciExtractor from "./scripts/desciExtractor";
 
 interface RootComponentPayload {
     path: string,
@@ -40,9 +42,11 @@ class pyExtractor {
 
         for (let x = 0; x < components.length; x++) {
             if (components[x].name === "Code Repository") {
-                return await this.getPyFiles(components[x].payload.path)
+                await this.getPyFiles(components[x].payload.path)
             }
         }
+        
+        await this.getParentFunctions();
     } 
 
     async getPyFiles(path: string) {
@@ -91,13 +95,26 @@ class pyExtractor {
 
         fs.writeFileSync(`desci/${name}`, response.data, 'utf-8')
     }
+
+    async getParentFunctions(): Promise<void> {
+        const parentFiles = await glob('./desci/*.py', {
+            ignore: './inputs/example.py'
+        })
+
+        parentFiles.forEach((dir: string) => {
+            const extract = new DesciExtractor({
+                directory: dir
+            })
+
+            extract.pullFunctions()
+        })
+    }
 }
 
 async function main() {
     // Replace PID with node of interest
     let tmp = new pyExtractor(76)
     const traversal = await tmp.getRoot();
-    //console.log(JSON.stringify(traversal))
 }
 
 main();
